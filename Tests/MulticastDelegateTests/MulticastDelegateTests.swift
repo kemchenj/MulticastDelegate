@@ -21,6 +21,8 @@ class MulticastDelegateTests: XCTestCase {
             return delegate
         }()
 
+        multicastDelegate.optionalMethodNotImplemented?()
+
         for i in 0..<10 {
             XCTAssertEqual(i, mainDelegate.methodInvokedCount(#selector(MockProtocol.nonOptionalMethod)))
             XCTAssertEqual(i, secondaryDelegate.methodInvokedCount(#selector(MockProtocol.nonOptionalMethod)))
@@ -121,5 +123,6 @@ class MockDelegate: NSObject, MockProtocol {
     @objc func nonOptionalMethodWithReturnValue() -> Bool
     @objc optional func optionalMethod()
     @objc optional func optionalMethodWithArguments(integer: Int, cgRect: CGRect, nsArray: NSArray, unsafePointer: UnsafeMutablePointer<CGPoint>, nilObject: NSObject?)
+    @objc optional func optionalMethodNotImplemented()
 }
 

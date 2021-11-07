@@ -120,7 +120,9 @@ BOOL is_method_signature_void(NSMethodSignature * __nonnull methodSignature) {
 
     if ([self.mainDelegate respondsToSelector:anInvocation.selector]) {
         [anInvocation invokeWithTarget:self.mainDelegate];
-    } else {
+    }
+
+    if (!isVoid) {
         [super forwardInvocation:anInvocation];
     }
 }
