@@ -22,26 +22,26 @@ class MulticastDelegateTests: XCTestCase {
         }()
 
         for i in 0..<10 {
-            XCTAssertEqual(i, mainDelegate.methodInvokedCount(#selector(MockProtocol.testNonOptionalFunc)))
-            XCTAssertEqual(i, secondaryDelegate.methodInvokedCount(#selector(MockProtocol.testNonOptionalFunc)))
-            multicastDelegate.testNonOptionalFunc()
+            XCTAssertEqual(i, mainDelegate.methodInvokedCount(#selector(MockProtocol.nonOptionalMethod)))
+            XCTAssertEqual(i, secondaryDelegate.methodInvokedCount(#selector(MockProtocol.nonOptionalMethod)))
+            multicastDelegate.nonOptionalMethod()
 
-            XCTAssertEqual(i, mainDelegate.methodInvokedCount(#selector(MockProtocol.testNonOptionalFuncWithReturnValue)))
-            XCTAssertEqual(0, secondaryDelegate.methodInvokedCount(#selector(MockProtocol.testNonOptionalFuncWithReturnValue)))
-            XCTAssertEqual(true, multicastDelegate.testNonOptionalFuncWithReturnValue())
+            XCTAssertEqual(i, mainDelegate.methodInvokedCount(#selector(MockProtocol.nonOptionalMethodWithReturnValue)))
+            XCTAssertEqual(0, secondaryDelegate.methodInvokedCount(#selector(MockProtocol.nonOptionalMethodWithReturnValue)))
+            XCTAssertEqual(true, multicastDelegate.nonOptionalMethodWithReturnValue())
 
-            XCTAssertEqual(i, mainDelegate.methodInvokedCount(#selector(MockProtocol.testOptionalFunc)))
-            XCTAssertEqual(i, secondaryDelegate.methodInvokedCount(#selector(MockProtocol.testOptionalFunc)))
-            multicastDelegate.testOptionalFunc?()
+            XCTAssertEqual(i, mainDelegate.methodInvokedCount(#selector(MockProtocol.optionalMethod)))
+            XCTAssertEqual(i, secondaryDelegate.methodInvokedCount(#selector(MockProtocol.optionalMethod)))
+            multicastDelegate.optionalMethod?()
 
             let integer = i
             let rect = CGRect(x: i, y: i, width: i, height: i)
             let nsArray = NSArray()
             var cgPoint = rect.origin
             let nilObject: NSObject? = nil
-            XCTAssertEqual(i, mainDelegate.methodInvokedCount(#selector(MockProtocol.testOptionalFuncWithArguments)))
-            XCTAssertEqual(i, secondaryDelegate.methodInvokedCount(#selector(MockProtocol.testOptionalFuncWithArguments)))
-            multicastDelegate.testOptionalFuncWithArguments?(integer: integer, cgRect: rect, nsArray: nsArray, unsafePointer: &cgPoint, nilObject: nilObject)
+            XCTAssertEqual(i, mainDelegate.methodInvokedCount(#selector(MockProtocol.optionalMethodWithArguments)))
+            XCTAssertEqual(i, secondaryDelegate.methodInvokedCount(#selector(MockProtocol.optionalMethodWithArguments)))
+            multicastDelegate.optionalMethodWithArguments?(integer: integer, cgRect: rect, nsArray: nsArray, unsafePointer: &cgPoint, nilObject: nilObject)
 
             XCTAssertEqual(mainDelegate.integer, integer)
             XCTAssertEqual(mainDelegate.cgRect, rect)
@@ -69,13 +69,14 @@ class MulticastDelegateTests: XCTestCase {
 }
 
 class MulticastMockDelegate: MulticastDelegate<MockProtocol>, MockProtocol {
-    func testNonOptionalFunc() {
-        mainDelegate?.testNonOptionalFunc()
-        delegates.allObjects.forEach { $0.testNonOptionalFunc() }
+
+    func nonOptionalMethod() {
+        mainDelegate?.nonOptionalMethod()
+        delegates.allObjects.forEach { $0.nonOptionalMethod() }
     }
 
-    func testNonOptionalFuncWithReturnValue() -> Bool {
-        mainDelegate?.testNonOptionalFuncWithReturnValue() ?? false
+    func nonOptionalMethodWithReturnValue() -> Bool {
+        mainDelegate?.nonOptionalMethodWithReturnValue() ?? false
     }
 }
 
@@ -92,21 +93,21 @@ class MockDelegate: NSObject, MockProtocol {
         methodsInvokedCounter[selector, default: 0]
     }
 
-    func testNonOptionalFunc() {
-        methodsInvokedCounter[#selector(testNonOptionalFunc), default: 0] += 1
+    func nonOptionalMethod() {
+        methodsInvokedCounter[#selector(nonOptionalMethod), default: 0] += 1
     }
 
-    func testNonOptionalFuncWithReturnValue() -> Bool {
-        methodsInvokedCounter[#selector(testNonOptionalFuncWithReturnValue), default: 0] += 1
+    func nonOptionalMethodWithReturnValue() -> Bool {
+        methodsInvokedCounter[#selector(nonOptionalMethodWithReturnValue), default: 0] += 1
         return true
     }
 
-    func testOptionalFunc() {
-        methodsInvokedCounter[#selector(testOptionalFunc), default: 0] += 1
+    func optionalMethod() {
+        methodsInvokedCounter[#selector(optionalMethod), default: 0] += 1
     }
 
-    func testOptionalFuncWithArguments(integer: Int, cgRect: CGRect, nsArray: NSArray, unsafePointer: UnsafeMutablePointer<CGPoint>, nilObject: NSObject?) {
-        methodsInvokedCounter[#selector(testOptionalFuncWithArguments(integer:cgRect:nsArray:unsafePointer:nilObject:)), default: 0] += 1
+    func optionalMethodWithArguments(integer: Int, cgRect: CGRect, nsArray: NSArray, unsafePointer: UnsafeMutablePointer<CGPoint>, nilObject: NSObject?) {
+        methodsInvokedCounter[#selector(optionalMethodWithArguments(integer:cgRect:nsArray:unsafePointer:nilObject:)), default: 0] += 1
         self.integer = integer
         self.cgRect = cgRect
         self.nsArray = nsArray
@@ -116,9 +117,9 @@ class MockDelegate: NSObject, MockProtocol {
 }
 
 @objc protocol MockProtocol: NSObjectProtocol {
-    @objc func testNonOptionalFunc()
-    @objc func testNonOptionalFuncWithReturnValue() -> Bool
-    @objc optional func testOptionalFunc()
-    @objc optional func testOptionalFuncWithArguments(integer: Int, cgRect: CGRect, nsArray: NSArray, unsafePointer: UnsafeMutablePointer<CGPoint>, nilObject: NSObject?)
+    @objc func nonOptionalMethod()
+    @objc func nonOptionalMethodWithReturnValue() -> Bool
+    @objc optional func optionalMethod()
+    @objc optional func optionalMethodWithArguments(integer: Int, cgRect: CGRect, nsArray: NSArray, unsafePointer: UnsafeMutablePointer<CGPoint>, nilObject: NSObject?)
 }
 
