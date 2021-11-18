@@ -12,9 +12,7 @@
 
 @import ObjectiveC;
 #import "MulticastDelegate.h"
-#import "DeallocHook.h"
 
-static char kAssociatedObjectKey_DeallocHook;
 static NSMutableDictionary *voidSelectorsPerClass = nil;
 
 #define SEL_VALUE(x)   [NSValue valueWithPointer:(x)]
@@ -86,11 +84,8 @@ BOOL is_method_signature_void(NSMethodSignature * __nonnull methodSignature) {
 - (void)addDelegate:(id)delegate shouldRetain:(BOOL)shouldRetain {
     if (shouldRetain) {
         [self.retainDelegates addObject:delegate];
-    } else {
-        [self installDeallocHookToObject:delegate];
     }
     [self.delegates addObject:delegate];
-
 }
 
 - (void)removeDelegate:(id)delegate {
@@ -133,18 +128,6 @@ BOOL is_method_signature_void(NSMethodSignature * __nonnull methodSignature) {
             [invocation invokeWithTarget:delegate];
         }
     }
-}
-
-- (void)installDeallocHookToObject:(id)delegate {
-    __weak typeof(self) weakSelf = self;
-    __weak id weakDelegate = delegate;
-    DeallocHook *hook = [[DeallocHook alloc] initWithHook:^{
-        [weakSelf removeDelegate:weakDelegate];
-    }];
-    objc_setAssociatedObject(delegate,
-                             &kAssociatedObjectKey_DeallocHook,
-                             hook,
-                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 + (NSSet*)collectVoidSelectorsForProtocol:(Protocol *)protocol {
