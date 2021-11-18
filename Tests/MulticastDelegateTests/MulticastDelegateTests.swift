@@ -68,6 +68,19 @@ class MulticastDelegateTests: XCTestCase {
         multicastDelegate.addDelegate(MockDelegate(), shouldRetain: true)
         XCTAssertFalse(multicastDelegate.delegates.allObjects.isEmpty)
     }
+
+    func testRemoveDelegate() {
+        let multicastDelegate = MulticastMockDelegate()
+        let delegate = MockDelegate()
+
+        XCTAssertTrue(multicastDelegate.delegates.allObjects.isEmpty)
+
+        multicastDelegate.addDelegate(delegate, shouldRetain: false)
+        XCTAssertFalse(multicastDelegate.delegates.allObjects.isEmpty)
+
+        multicastDelegate.removeDelegate(delegate)
+        XCTAssertTrue(multicastDelegate.delegates.allObjects.isEmpty)
+    }
 }
 
 class MulticastMockDelegate: MulticastDelegate<MockProtocol>, MockProtocol {
