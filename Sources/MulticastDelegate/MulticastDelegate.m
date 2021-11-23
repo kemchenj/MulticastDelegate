@@ -107,17 +107,24 @@ BOOL is_method_signature_void(NSMethodSignature * __nonnull methodSignature) {
         || [self voidDelegateMethodsContain:aSelector];
 }
 
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
+    NSMethodSignature *fromSuper = [super methodSignatureForSelector:aSelector];
+    if (fromSuper) {
+        return fromSuper;
+    } else {
+        return [self.mainDelegate methodSignatureForSelector:aSelector];
+    }
+}
+
 - (void)forwardInvocation:(NSInvocation *)anInvocation {
-    BOOL isVoid = is_method_signature_void(anInvocation.methodSignature);
-    if (isVoid) {
+    BOOL voidDelegateMethodsContain = [self voidDelegateMethodsContain:anInvocation.selector];
+    if (voidDelegateMethodsContain) {
         [self voidDelegateMethodInvoked:anInvocation];
     }
 
     if ([self.mainDelegate respondsToSelector:anInvocation.selector]) {
         [anInvocation invokeWithTarget:self.mainDelegate];
-    }
-
-    if (!isVoid) {
+    } else if (!voidDelegateMethodsContain) {
         [super forwardInvocation:anInvocation];
     }
 }

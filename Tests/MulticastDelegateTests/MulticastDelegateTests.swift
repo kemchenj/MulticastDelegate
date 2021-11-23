@@ -81,6 +81,19 @@ class MulticastDelegateTests: XCTestCase {
         multicastDelegate.removeDelegate(delegate)
         XCTAssertTrue(multicastDelegate.delegates.allObjects.isEmpty)
     }
+
+    // Apple SDK will force type cast the delegate to its origin delegate type,
+    // which would lead to unrecognized selector and crash.
+    func testMainDelegateForwarding() {
+        let multicastDelegate = MulticastMockDelegate()
+        let delegate = MockDelegate()
+
+        multicastDelegate.mainDelegate = delegate
+
+        multicastDelegate.perform(#selector(MockDelegate.methodNotWithinProtocol))
+
+        XCTAssertTrue(delegate.hasCallMethodNotWithinProtocol)
+    }
 }
 
 class MulticastMockDelegate: MulticastDelegate<MockProtocol>, MockProtocol {
@@ -103,6 +116,13 @@ class MockDelegate: NSObject, MockProtocol {
     var nsArray: NSArray?
     var unsafePointer: UnsafeMutablePointer<CGPoint>?
     var nilObject: NSObject?
+
+    var hasCallMethodNotWithinProtocol = false
+
+    @objc
+    func methodNotWithinProtocol() {
+        hasCallMethodNotWithinProtocol = true
+    }
 
     func methodInvokedCount(_ selector: Selector) -> Int {
         methodsInvokedCounter[selector, default: 0]
