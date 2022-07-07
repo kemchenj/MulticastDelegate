@@ -28,7 +28,7 @@ BOOL is_method_signature_void(NSMethodSignature * __nonnull methodSignature) {
 }
 
 @interface MulticastDelegate ()
-@property(nonatomic, retain) NSMutableSet *retainDelegates;
+@property(nonatomic, strong) NSMutableSet *retainDelegates;
 @end
 
 @implementation MulticastDelegate

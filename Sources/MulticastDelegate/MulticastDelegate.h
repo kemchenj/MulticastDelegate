@@ -11,8 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MulticastDelegate<Delegate> : NSObject
 
-@property(nonatomic, retain) __nullable Delegate mainDelegate;
-@property(nonatomic, retain) NSHashTable<Delegate> *delegates;
+@property(nonatomic, weak) __nullable Delegate mainDelegate;
+@property(nonatomic, strong) NSHashTable<Delegate> *delegates;
 
 - (void)addDelegate:(Delegate)delegate
        shouldRetain:(BOOL)shouldRetain
